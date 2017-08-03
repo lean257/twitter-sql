@@ -41,17 +41,17 @@ module.exports = function makeRouterWithSockets (io) {
 
   // single-tweet page
   router.get('/tweets/:id', function(req, res, next){
-    const query = 'SELECT * FROM users u JOIN tweets t ON u.id=t.user_id WHERE t.id=$1'
+    const query = 'SELECT u.name, t.id, t.content FROM users u JOIN tweets t ON u.id=t.user_id WHERE t.id=$1';
     client.query(query,[req.params.id], function(err, result){
       if (err) return next(err);
-      let tweets = result.rows;
-      console.log(req.params.id)
-      console.log(req.params)
+      // let tweets = result.rows;
+      // console.log(req.params.id)
+      // console.log(req.params)
       res.render('index', {
         title: 'Twitter.js',
-        tweets: tweets, // an array of only one element ;-)
-        showForm: false,
-        id: req.params.id
+        tweets: result.rows, // an array of only one element ;-)
+        showForm: false
+        // id: req.params.id
       });
     })
   });
