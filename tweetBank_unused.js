@@ -1,14 +1,5 @@
 'use strict';
-const pg = require('pg');
-const client = new pg.Client(process.env.DATABASE_URL);
 
-client.connect(function(err){
-  console.log(err);
-});
-
-function query(query, input, cb) {
-  client.query(query, input, cb);
-}
 var _ = require('lodash');
 var data = [];
 

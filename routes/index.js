@@ -8,16 +8,14 @@ module.exports = function makeRouterWithSockets (io) {
 
   // a reusable function
   function respondWithAllTweets (req, res, next){
-    client.query('SELECT t.id, t.content, u.name FROM tweets t join users u on t.user_id=u.id', function(err, result){
+    client.query('SELECT * from tweets', function(err, result){
       if (err) return next(err);
       let tweets = result.rows;
-      res.render('index', {title: 'Twitter.js', tweets: tweets, showForm: true })
-    })
-    var allTheTweets = tweetBank.list();
-    res.render('index', {
-      title: 'Twitter.js',
-      tweets: allTheTweets,
-      showForm: true
+      res.render('index', {
+        title: 'Twitter.js',
+        tweets: tweets,
+        showForm: true
+      });
     });
   }
 
@@ -27,7 +25,8 @@ module.exports = function makeRouterWithSockets (io) {
 
   // single-user page
   router.get('/users/:username', function(req, res, next){
-    var tweetsForName = tweetBank.find({ name: req.params.username });
+    // var tweetsForName = tweetBank.find({ name: req.params.username });
+    client.query('')
     res.render('index', {
       title: 'Twitter.js',
       tweets: tweetsForName,
