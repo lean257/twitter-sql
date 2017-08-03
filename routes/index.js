@@ -1,12 +1,18 @@
 'use strict';
 var express = require('express');
 var router = express.Router();
-var tweetBank = require('../tweetBank');
+// var tweetBank = require('../tweetBank');
+var client = require('../db');
 
 module.exports = function makeRouterWithSockets (io) {
 
   // a reusable function
   function respondWithAllTweets (req, res, next){
+    client.query('SELECT t.id, t.content, u.name FROM tweets t join users u on t.user_id=u.id', function(err, result){
+      if (err) return next(err);
+      let tweets = result.rows;
+      res.render('index', {title: 'Twitter.js', tweets: tweets, showForm: true })
+    })
     var allTheTweets = tweetBank.list();
     res.render('index', {
       title: 'Twitter.js',
