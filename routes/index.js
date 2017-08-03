@@ -1,4 +1,5 @@
 'use strict';
+
 var express = require('express');
 var router = express.Router();
 // var tweetBank = require('../tweetBank');
@@ -8,7 +9,7 @@ module.exports = function makeRouterWithSockets (io) {
 
   // a reusable function
   function respondWithAllTweets (req, res, next){
-    client.query('SELECT * from tweets', function(err, result){
+    client.query('SELECT * from tweets INNER JOIN users ON users.id=tweets.user_id', function(err, result){
       if (err) return next(err);
       let tweets = result.rows;
       res.render('index', {
@@ -25,23 +26,34 @@ module.exports = function makeRouterWithSockets (io) {
 
   // single-user page
   router.get('/users/:username', function(req, res, next){
-    // var tweetsForName = tweetBank.find({ name: req.params.username });
-    client.query('')
-    res.render('index', {
-      title: 'Twitter.js',
-      tweets: tweetsForName,
-      showForm: true,
-      username: req.params.username
-    });
+    const query = 'SELECT * FROM users u INNER JOIN tweets t ON u.id=t.user_id WHERE u.name=$1'
+    client.query(query,[req.params.username], function(err, result){
+      if (err) return next(err);
+      let tweets = result.rows;
+      res.render('index', {
+        title: 'Twitter.js',
+        tweets: tweets,
+        showForm: true,
+        username: req.params.username
+      });
+    })
   });
 
   // single-tweet page
   router.get('/tweets/:id', function(req, res, next){
-    var tweetsWithThatId = tweetBank.find({ id: Number(req.params.id) });
-    res.render('index', {
-      title: 'Twitter.js',
-      tweets: tweetsWithThatId // an array of only one element ;-)
-    });
+    const query = 'SELECT * FROM users u JOIN tweets t ON u.id=t.user_id WHERE t.id=$1'
+    client.query(query,[req.params.id], function(err, result){
+      if (err) return next(err);
+      let tweets = result.rows;
+      console.log(req.params.id)
+      console.log(req.params)
+      res.render('index', {
+        title: 'Twitter.js',
+        tweets: tweets, // an array of only one element ;-)
+        showForm: false,
+        id: req.params.id
+      });
+    })
   });
 
   // create a new tweet
