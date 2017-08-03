@@ -12,7 +12,6 @@ module.exports = function makeRouterWithSockets (io) {
     client.query('SELECT t.id, u.name,t.content from tweets t INNER JOIN users u ON u.id=t.user_id', function(err, result){
       if (err) return next(err);
       let tweets = result.rows;
-      console.log(tweets);
       res.render('index', {
         title: 'Twitter.js',
         tweets: tweets,
@@ -63,19 +62,15 @@ module.exports = function makeRouterWithSockets (io) {
     let user_id;
     client.query('select * from users where name=$1', [req.body.name], function(err, result){
       if (err) return next(err);
-      console.log(result.rows)
       //if no user:
       if (result.rows.length===0) {
         //create new user
-        console.log('make new user')
         client.query('insert into users (name) values($1) returning *', [req.body.name], function(err1, result1){
           if (err1) return next(err1);
           user_id = result1.rows[0].id;
-          console.log(user_id)
           res.redirect('/');
         })
       } else {
-        console.log('else')
         user_id = result.rows[0].id*1;
         client.query('insert into tweets (user_id, content ) values($1, $2) returning *', [user_id, req.body.content], function(err, result){
         if (err) return next(err);
